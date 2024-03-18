@@ -1,0 +1,72 @@
+--------------LOAD OPERATION----------------
+!((THE OPERATION LOADS (IN MEMORY) AN IMAGE IN PPM OR PGM IMAGE FORMAT))!
+	1. Checking if the first character of each row is '#' or not, and if
+	  it is, it continues to read the whole line (till it reaches endline).
+	2. At first, the line containing the magic word of the image
+	  is read, and the magic word's number is extracted from the string.
+	  The same goes with the width and height of the image, which are
+	  converted to integers by atoi().
+	3. The line containing the maximum color value is also fully read and
+	  the value is extracted and converted to an integer. 
+	4. Upon reading the data, the image's matrix gets allocated dynamically
+	  and depending on the image format, the matrix gets read.
+	5. If the image format is in binary, the initial file gets closed and
+	  it opens again in binary mode.
+--------------SAVE OPERATION----------------
+!((THE OPERATION SAVES (ON DISK) THE LOADED IMAGE, EITHER IN ASCII OR BINARY))!
+	1. At first, the whole line (of the save operation) is read and if the
+	  parameter "ascii" exists, the file gets saved in ascii format (and if
+	  not, then the file is saved in binary).
+	2. The image data gets saved first and then depending on the format,
+	  the image matrix gets saved.
+--------------SELECT OPERATION--------------
+!((THE OPERATION SELECTS A RANGE OF PIXELS (USED FOR THE NEXT OPERATIONS)))!
+	1. If the parameter "ALL" is found, all the pixels get selected.
+	2. If not, then the selection is done based on the chosen pixels
+	  (and arranges them in case they are not in order).
+--------------FILTER OPERATION--------------
+!((THE OPERATION APLLIES A FILTER ON THE LOADED IMAGE'S SELECTION))!
+	1. Based on the selected filter, each value (of every channel) in every
+	  3 by 3 submatrix of the original matrix is multiplied with the
+	  correspondent value of the filter kernel and the clamped sum of the
+	  multiplications is the new value of the center pixel of each
+	  submatrix.
+	2. The new pixel values are saved in a copy (of the image matrix) and
+	  the original matrix gets free'd.
+	3. Now, the original matrix pointer is given the starting address of
+	  the copy matrix (so now the copy matrix becomes the original one).
+--------------HISTOGRAM OPERATION-----------
+!((THE OPERATION SHOWS THE PGM IMAGE'S HISTOGRAM (BASED ON THE SELECTION)))!
+	1. The frequency of each pixel in the selected range is calculated,
+	  and based on the number of bins, it gets updated.
+	2. Updating it means that every pixel of each "pack" gets summed up
+	  and now the frequency of a pixel returns the sum of the pack in which
+	  the pixel is found.
+	3. For each bin, the star count (that have to be printed) gets
+	  calculated and printed.
+--------------EQUALIZE OPERATION------------
+!((THE OPERATION EQUALIZES PGM IMAGES))!
+	1. Based on the frequency of each pixel, every pixel gets recalculated
+	  by using the equalization formula. By rounding the pixels to an
+	  integer value, round() function was used, and then the value gets
+	  clamped so it doesn't go beyond [0, 255].
+--------------CROP OPERATION----------------
+!((THE OPERATION CROPS THE LOADED IMAGE BASED ON THE SELECTION))!
+	1. A cropped matrix gets allocated and the values in the selection
+	  range of the original matrix get copied in the cropped matrix.
+	2. Then, the original matrix gets deallocated and the original matrix
+	  pointer is given the address that the cropped matrix pointer holds. 
+--------------ROTATE OPERATION--------------
+!((THE OPERATION ROTATES THE SELECTION OF THE LOADED IMAGE))!
+	1. In case of negative angle, the number of rotations is done by doing
+	  (360 + angle) / 90, so the number of rotations is mirrored (compared
+	  to its absolute value).
+	2. For each rotation, a rotated matrix is created (with the size of 
+	  the selection range of the original matrix) and each pixel from
+	  the current selection gets moved 90 degrees to the right (every 
+	  channel of every colored pixel, if the image is colored).
+	3. If the whole image is selected, the original matrix gets free'd and
+	  now the pointer points to the address that the rotated matrix holds.
+	4. If only a submatrix is selected, then the values in the rotated
+	  submatrix get copied in the original matrix, replacing the original
+	  values in the chosen selection.
